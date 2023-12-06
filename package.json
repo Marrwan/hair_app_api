@@ -1,0 +1,36 @@
+{
+  "name": "hair_app",
+  "version": "1.0.0",
+  "description": "Hair App",
+  "main": "./bin/www",
+  "scripts": {
+    "test": "npm run test",
+    "start": "node ./bin/www",
+    "dev": "node --watch ./bin/www"
+  },
+  "keywords": [
+    "nodejs",
+    "prisma",
+    "postgresql"
+  ],
+  "author": "Abdulbasit and Hudhayfah",
+  "license": "ISC",
+  "dependencies": {
+    "@novu/node": "^0.21.0",
+    "@prisma/client": "^5.6.0",
+    "bcryptjs": "^2.4.3",
+    "connect-pg-simple": "^9.0.1",
+    "cors": "^2.8.5",
+    "crypto": "^1.0.1",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "express-session": "^1.17.3",
+    "joi": "^17.11.0",
+    "jsonwebtoken": "^9.0.2",
+    "passport": "^0.6.0",
+    "passport-facebook": "^3.0.0",
+    "passport-google-oauth20": "^2.0.0",
+    "passport-local": "^1.0.0",
+    "prisma": "^5.6.0"
+  }
+}

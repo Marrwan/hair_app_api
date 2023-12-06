@@ -1,0 +1,167 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// model Books {
+//   id        Int      @id @default(autoincrement())
+//   title     String   @unique @db.VarChar(255)
+//   author    String   @db.VarChar(255)
+//   content   String?
+//   createdAt DateTime @db.Timestamptz(6)
+//   updatedAt DateTime @db.Timestamptz(6)
+// }
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+enum Ratings {
+  ONE
+  TWO
+  THREE
+  FOUR
+  FIVE
+}
+
+enum APPOINTMENT_STATUS {
+  ACCEPTED
+  DECLINED
+  PENDING
+}
+
+model User {
+  id                    String                 @id @default(uuid())
+  username              String
+  firstName             String
+  lastName              String
+  phone                 String?
+  avatar                String?
+  gender                String?
+  latitude              Decimal?
+  longitude             Decimal?
+  isActive              Boolean                @default(false)
+  isAdmin               Boolean                @default(false)
+  password              String?
+  createdAt             DateTime               @default(now())
+  updatedAt             DateTime               @updatedAt
+  activated             Boolean                @default(false)
+  activationToken       String?                @unique
+  forgotPasswordToken    Int?                @unique
+  recoveryNumberToken   String?                @unique
+  appointments          Appointment[]
+  notification_settings Notification_settings?
+  wallet                Wallet?
+  Stylist               Stylist[]
+  Customer              Customer[]
+}
+
+model Stylist {
+  id              Int           @id @default(autoincrement())
+  email           String        @unique
+  userId          String
+  user            User          @relation(fields: [userId], references: [id])
+  brandName       String?
+  aboutMe         String?
+  ratings         Ratings?
+  services        String[]
+  my_appointments Appointment[] // array of appointments (a different model)
+  hairstyles      Hair[]
+}
+
+model Customer {
+  id           Int           @id @default(autoincrement())
+  email        String        @unique
+  userId       String
+  user         User          @relation(fields: [userId], references: [id])
+  appointments Appointment[]
+}
+
+model Hair {
+  id          Int      @id @default(autoincrement())
+  name        String   @unique
+  description String
+  colors      String[]
+  duration    String
+  ratings     Ratings
+  cost        String
+
+  stylistId Int
+  stylist   Stylist @relation(fields: [stylistId], references: [id])
+}
+
+// Likewise this too
+model Notification_settings {
+  id           Int     @id @default(autoincrement())
+  appointment  Boolean @default(true)
+  push         Boolean @default(false)
+  ring_out     Boolean @default(false)
+  vibrate      Boolean @default(true)
+  new_stylist  Boolean @default(true)
+  new_products Boolean @default(false)
+  userId       String  @unique
+  user         User    @relation(fields: [userId], references: [id])
+}
+
+model Wallet {
+  id                    Int                    @id @default(autoincrement())
+  balance               Decimal                @default(0.00)
+  userId                String                 @unique
+  user                  User                   @relation(fields: [userId], references: [id])
+  transactions          Transaction[]
+  paymentMethod         String? // Identify the linked payment method for transactions
+  currency              String? // Store the currency associated with the wallet
+  transactionStatus     String? // Track the status of each transaction
+  transactionId         String? // Unique identifier for each wallet transaction
+  limits                Json? // Set limits for wallet transactions
+  withdrawalRequests    WithdrawalRequest[]
+  securityTokens        String[] // Store security tokens or authentication-related data
+  notifications         Json? // User preferences for wallet transaction notifications
+  userPreferences       Json? // User-configurable wallet preferences
+  recurringTransactions RecurringTransaction[]
+  metadata              Json? // Additional metadata fields
+}
+
+model Transaction {
+  id       Int      @id @default(autoincrement())
+  type     String // Transaction type (e.g., deposit, withdrawal, payment)
+  amount   Decimal
+  date     DateTime
+  walletId Int
+  wallet   Wallet   @relation(fields: [walletId], references: [id])
+}
+
+model WithdrawalRequest {
+  id       Int      @id @default(autoincrement())
+  status   String // Request status (e.g., pending, approved, rejected)
+  amount   Decimal
+  date     DateTime
+  walletId Int
+  wallet   Wallet   @relation(fields: [walletId], references: [id])
+}
+
+model RecurringTransaction {
+  id       Int     @id @default(autoincrement())
+  type     String // Transaction type (e.g., subscription, recurring payment)
+  amount   Decimal
+  schedule Json // Recurring payment schedule (e.g., monthly, weekly)
+  walletId Int
+  wallet   Wallet  @relation(fields: [walletId], references: [id])
+}
+
+model Appointment {
+  id     Int                @id @default(autoincrement())
+  date   DateTime
+  time   DateTime
+  status APPOINTMENT_STATUS @default(PENDING)
+  paid   Boolean            @default(false)
+
+  stylistId  Int
+  stylist    Stylist   @relation(fields: [stylistId], references: [id])
+  userId     String
+  user       User      @relation(fields: [userId], references: [id])
+  Customer   Customer? @relation(fields: [customerId], references: [id])
+  customerId Int?
+}
