@@ -1,3 +1,0 @@
--- AlterTable
-ALTER TABLE "Stylist" ALTER COLUMN "brandName" DROP NOT NULL,
-ALTER COLUMN "aboutMe" DROP NOT NULL;
